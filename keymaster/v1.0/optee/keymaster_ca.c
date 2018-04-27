@@ -7,6 +7,7 @@
 #include <assert.h>
 #include <util.h>
 #include "keymaster_ca.h"
+#include "tee_data_types.h"
 
 #define SALT_LEN 		(20)
 

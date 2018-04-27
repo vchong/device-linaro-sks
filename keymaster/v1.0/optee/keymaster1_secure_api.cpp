@@ -17,6 +17,7 @@
 #include <keymaster/authorization_set.h>
 #include <keymaster/android_keymaster_utils.h>
 #include <keymaster/logger.h>
+#include "otz_tee_crypto_api.h"
 using namespace keymaster;
 
 #define SALT_LEN 		(20)
