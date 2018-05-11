@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#define LOG_TAG "android.hardware.gatekeeper@1.0-service"
+#define LOG_TAG "android.hardware.gatekeeper@1.0-service.optee"
 
 #include <android/hardware/gatekeeper/1.0/IGatekeeper.h>
 

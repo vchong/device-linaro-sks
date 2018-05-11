@@ -1,4 +1,4 @@
-#define LOG_TAG "android.hardware.gatekeeper@1.0-impl"
+#define LOG_TAG "android.hardware.gatekeeper@1.0-impl.optee"
 
 #include "Gatekeeper.h"
 

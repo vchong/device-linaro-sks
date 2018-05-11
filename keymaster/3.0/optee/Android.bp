@@ -1,5 +1,5 @@
 cc_library_shared {
-    name: "android.hardware.keymaster@3.0-impl",
+    name: "android.hardware.keymaster@3.0-impl.optee",
     relative_install_path: "hw",
     proprietary: true,
     srcs: [
@@ -16,10 +16,10 @@ cc_library_shared {
 }
 
 cc_binary {
-    name: "android.hardware.keymaster@3.0-service",
+    name: "android.hardware.keymaster@3.0-service.optee",
     relative_install_path: "hw",
     proprietary: true,
-    init_rc: ["android.hardware.keymaster@3.0-service.rc"],
+    init_rc: ["android.hardware.keymaster@3.0-service.optee.rc"],
     srcs: ["service.cpp"],
 
     shared_libs: [

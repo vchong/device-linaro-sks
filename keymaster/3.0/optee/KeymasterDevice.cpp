@@ -1,4 +1,4 @@
-#define LOG_TAG "android.hardware.keymaster@3.0-impl"
+#define LOG_TAG "android.hardware.keymaster@3.0-impl.optee"
 
 #include "KeymasterDevice.h"
 
