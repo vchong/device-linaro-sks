@@ -84,6 +84,9 @@ Return<ErrorCode> KeymasterDevice::abort(uint64_t operationHandle) {
     return ErrorCode {};
 }
 
+IKeymasterDevice *KeymasterDevice::getInstance(void){
+  return new KeymasterDevice();
+}
 
 // Methods from ::android::hidl::base::V1_0::IBase follow.
 

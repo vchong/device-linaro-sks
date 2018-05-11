@@ -16,7 +16,9 @@
 #define LOG_TAG "android.hardware.gatekeeper@1.0-service.optee"
 
 #include <android/hardware/gatekeeper/1.0/IGatekeeper.h>
+#include <android/hardware/gatekeeper/1.0/types.h>
 
+#include <android/log.h>
 #include <hidl/HidlSupport.h>
 #include <hidl/HidlTransportSupport.h>
 #include <hidl/LegacySupport.h>
@@ -30,24 +32,30 @@ using android::hardware::joinRpcThreadpool;
 
 // Generated HIDL files
 using android::hardware::gatekeeper::V1_0::IGatekeeper;
+using android::hardware::gatekeeper::V1_0::implementation::Gatekeeper;
 
 using android::sp;
 using android::status_t;
 using android::OK;
 
 int main() {
-
-	  sp<IGatekeeper> service = new Gatekeeper();
+	  status_t status;
+	  android::sp<IGatekeeper> service = Gatekeeper::getInstance();
 
 	  configureRpcThreadpool(1, true /*callerWillJoin*/);
-	  status_t status = service->registerAsService();
+	  status = service->registerAsService();
 
-	  if (status == OK) {
-		ALOGI("Gatekeeper HAL Ready.");
-	    joinRpcThreadpool(); //doesn't return
+	  if (service != nullptr) {
+		  status = service->registerAsService();
+		  if (status != OK) //!= 0
+			  ALOGE("Can't register Gatekeeper HAL service, nullptr");
+		  else
+			  ALOGI("Gatekeeper HAL Ready.");
+	  } else {
+	      ALOGE("Can't create instance of Gatekeeper, nullptr");
 	  }
-	  else
-	    ALOGE("Cannot register Gatekeeper HAL service!");
 
-	  return 1; //never here if registered
+	  joinRpcThreadpool(); //doesn't return
+
+	  return 0; // should never get here
 }

@@ -38,7 +38,7 @@ struct KeymasterDevice : public IKeymasterDevice {
     Return<ErrorCode> abort(uint64_t operationHandle) override;
 
     // Methods from ::android::hidl::base::V1_0::IBase follow.
-
+    static IKeymasterDevice* getInstance(void);
 };
 
 // FIXME: most likely delete, this is only for passthrough implementations

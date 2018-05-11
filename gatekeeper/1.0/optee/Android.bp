@@ -17,10 +17,11 @@ cc_library_shared {
 
 cc_binary {
     name: "android.hardware.gatekeeper@1.0-service.optee",
-    relative_install_path: "hw",
+    defaults: ["hidl_defaults"],
     proprietary: true,
-    init_rc: ["android.hardware.gatekeeper@1.0-service.optee.rc"],
+    relative_install_path: "hw",
     srcs: ["service.cpp"],
+    init_rc: ["android.hardware.gatekeeper@1.0-service.optee.rc"],
 
     shared_libs: [
         "liblog",
@@ -32,6 +33,7 @@ cc_binary {
         "libhidlbase",
         "libhidltransport",
         "android.hardware.gatekeeper@1.0",
+        "android.hardware.gatekeeper@1.0-impl.optee",
     ],
 
 }

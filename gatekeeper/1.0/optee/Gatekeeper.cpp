@@ -29,6 +29,9 @@ Return<void> Gatekeeper::deleteAllUsers(deleteAllUsers_cb _hidl_cb) {
     return Void();
 }
 
+IGatekeeper *Gatekeeper::getInstance(void){
+  return new Gatekeeper();
+}
 
 // Methods from ::android::hidl::base::V1_0::IBase follow.
 

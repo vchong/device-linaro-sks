@@ -18,7 +18,9 @@
 #define LOG_TAG "android.hardware.keymaster@3.0-service.optee"
 
 #include <android/hardware/keymaster/3.0/IKeymasterDevice.h>
+#include <android/hardware/keymaster/3.0/types.h>
 
+#include <android/log.h>
 #include <hidl/HidlSupport.h>
 #include <hidl/HidlTransportSupport.h>
 #include <hidl/LegacySupport.h>
@@ -32,24 +34,29 @@ using android::hardware::joinRpcThreadpool;
 
 // Generated HIDL files
 using android::hardware::keymaster::V3_0::IKeymasterDevice;
+using android::hardware::keymaster::V3_0::implementation::KeymasterDevice;
 
 using android::sp;
 using android::status_t;
 using android::OK;
 
 int main() {
-
-	  sp<IKeymasterDevice> service = new KeymasterDevice();
+	  status_t status;
+	  android::sp<IKeymasterDevice> service = KeymasterDevice::getInstance();
 
 	  configureRpcThreadpool(1, true /*callerWillJoin*/);
 
-	  status_t status = service->registerAsService();
-	  if (status == OK) {
-		ALOGI("Keymaster HAL Ready.");
-	    joinRpcThreadpool(); //doesn't return
+	  if (service != nullptr) {
+		  status = service->registerAsService();
+		  if (status != OK) //!= 0
+			  ALOGE("Can't register Keymaster HAL service, nullptr");
+		  else
+			  ALOGI("Keymaster HAL Ready.");
+	  } else {
+	      ALOGE("Can't create instance of KeymasterDevice, nullptr");
 	  }
-	  else
-	    ALOGE("Cannot register Keymaster HAL service!");
 
-	  return 1; //never here if registered
+	  joinRpcThreadpool(); //doesn't return
+
+	  return 0; // should never get here
 }
