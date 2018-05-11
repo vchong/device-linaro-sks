@@ -27,6 +27,7 @@ struct Gatekeeper : public IGatekeeper {
     Return<void> deleteAllUsers(deleteAllUsers_cb _hidl_cb) override;
 
     // Methods from ::android::hidl::base::V1_0::IBase follow.
+    // static function to return the service object (usually as a singleton)
     static IGatekeeper* getInstance(void);
 };
 

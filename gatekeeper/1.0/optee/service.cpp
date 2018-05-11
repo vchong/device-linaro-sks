@@ -42,6 +42,7 @@ int main() {
 	  status_t status;
 	  android::sp<IGatekeeper> service = Gatekeeper::getInstance();
 
+	  ALOGE("Gatekeeper HAL main");
 	  configureRpcThreadpool(1, true /*callerWillJoin*/);
 	  status = service->registerAsService();
 
@@ -49,13 +50,14 @@ int main() {
 		  status = service->registerAsService();
 		  if (status != OK) //!= 0
 			  ALOGE("Can't register Gatekeeper HAL service, nullptr");
-		  else
+		  else {
 			  ALOGI("Gatekeeper HAL Ready.");
+			  joinRpcThreadpool(); //doesn't return
+		  }
 	  } else {
 	      ALOGE("Can't create instance of Gatekeeper, nullptr");
 	  }
 
-	  joinRpcThreadpool(); //doesn't return
-
-	  return 0; // should never get here
+	  ALOGI("Gatekeeper HAL failed to join thread pool.");
+	  return 1; // should never get here under normal cases
 }
