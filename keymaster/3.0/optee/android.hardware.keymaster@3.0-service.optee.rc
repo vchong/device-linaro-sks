@@ -2,3 +2,4 @@ service keymaster-3-0 /vendor/bin/hw/android.hardware.keymaster@3.0-service.opte
     class early_hal
     user system
     group system drmrpc
+    seclabel u:r:su:s0
