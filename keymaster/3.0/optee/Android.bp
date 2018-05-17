@@ -34,6 +34,7 @@ cc_binary {
         "libhardware",
         "libhidlbase",
         "libhidltransport",
+        "liboptee_cryptoki", //assume CFG_SECURE_KEY_SERVICES=y
         "android.hardware.keymaster@3.0",
         //"android.hardware.keymaster@3.0-impl.optee",
     ],
