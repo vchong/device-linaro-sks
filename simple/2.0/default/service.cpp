@@ -22,14 +22,14 @@ int main() {
           res = ser->registerAsService();
           if(res != 0) {
             ALOGE("Can't register instance of SimpleHardware, nullptr");
-	    return 1;
+	    return res;
 	  }
       } else {
           ALOGE("Can't create instance of SimpleHardware, nullptr");
-	  return 1;
+	  return res;
        }
 
       joinRpcThreadpool();
 
-      return 1; // should never get here
+      return res; // should never get here
 }

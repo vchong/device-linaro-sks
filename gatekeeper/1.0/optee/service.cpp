@@ -59,5 +59,5 @@ int main() {
 	  }
 
 	  ALOGI("Gatekeeper HAL failed to join thread pool.");
-	  return 1; // should never get here under normal cases
+	  return status; // should never get here under normal cases
 }
