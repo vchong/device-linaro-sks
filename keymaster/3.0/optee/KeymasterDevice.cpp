@@ -128,6 +128,12 @@ Return<void> KeymasterDevice::generateKey(const hidl_vec<KeyParameter>& keyParam
     KeyCharacteristics resultCharacteristics;
     hidl_vec<uint8_t> resultKeyBlob;
 
+    for (size_t i = 0; i < keyParams.size(); ++i) {
+		ALOGD("%s keyParams[%d].tag:%d", __FUNCTION__, i, keyParams[i].tag);
+		if (keyParams[i].tag == Tag::ALGORITHM)
+			ALOGD("%s keyParams[%d].f.algorithm:%d", __FUNCTION__, i, keyParams[i].f.algorithm);
+    }
+
 	rv = init_lib_and_find_token_slot(&slot);
 	if (rv != CKR_OK) {
 		ALOGE("%s init_lib_and_find_token_slot failed", __FUNCTION__, );
@@ -137,6 +143,27 @@ Return<void> KeymasterDevice::generateKey(const hidl_vec<KeyParameter>& keyParam
 	rv = C_OpenSession(slot, session_flags, NULL, 0, &session);
 	if (rv != CKR_OK)
 		goto bail;
+
+	switch (keyParams[i].tag) {
+	case Tag::ALGORITHM:
+		switch (keyParams[i].f.algorithm) {
+		case 1: //RSA
+			break;
+		case 3: //EC
+			break;
+		case 32: //AES
+			break;
+		case 128: //HMAC
+			break;
+		default:
+			ALOGE("%s invalid Tag::ALGORITHM", __FUNCTION__, );
+			break;
+		}
+		break;
+	default:
+		ALOGE("%s not Tag::ALGORITHM", __FUNCTION__, );
+		break;
+	}
 
 	/*
 	 * Generate a Generic Secret object.
