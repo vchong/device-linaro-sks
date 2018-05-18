@@ -1,5 +1,5 @@
 subdirs = [
-    "keymaster",
+    //"keymaster", //use Android.mk for this
     "gatekeeper",
     "simple",
 ]
