@@ -35,7 +35,8 @@ include $(CLEAR_VARS)
 ifeq ($(USE_32_BIT_KEYSTORE), true)
 LOCAL_MULTILIB := 32
 endif
-LOCAL_MODULE := keystore2_0.$(TARGET_BOARD_PLATFORM)
+LOCAL_MODULE := keystore.$(TARGET_BOARD_PLATFORM)
+#LOCAL_MODULE := keystore2_0.$(TARGET_BOARD_PLATFORM)
 
 ifeq ($(shell test $(PLATFORM_SDK_VERSION) -ge 21 && echo OK),OK)
 	LOCAL_MODULE_RELATIVE_PATH := hw
@@ -76,7 +77,9 @@ LOCAL_SHARED_LIBRARIES := libcrypto \
 			  libkeystore_binder \
 			  libteec \
 			  libkeymaster_messages \
-			  libkeymaster_portable
+			  libkeymaster_portable \
+			  liboptee_cryptoki
+# assume CFG_SECURE_KEY_SERVICES=y
 
 LOCAL_MODULE_TAGS := optional
 LOCAL_EXPORT_C_INCLUDE_DIRS := $(LOCAL_PATH)
