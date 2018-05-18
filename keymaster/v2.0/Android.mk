@@ -86,3 +86,30 @@ LOCAL_EXPORT_C_INCLUDE_DIRS := $(LOCAL_PATH)
 LOCAL_ADDITIONAL_DEPENDENCIES := $(LOCAL_PATH)/Android.mk
 #LOCAL_REQUIRED_MODULES := $(KEYMASTER_TA_BINARY)
 include $(BUILD_SHARED_LIBRARY)
+
+# Unit tests for libkeymaster
+include $(CLEAR_VARS)
+LOCAL_MODULE := optee_keymaster_tests
+LOCAL_SRC_FILES := \
+	unit_test/android_keymaster_test.cpp \
+	unit_test/android_keymaster_test_utils.cpp
+
+LOCAL_C_INCLUDES := \
+	external/boringssl/include \
+	system/keymaster/include \
+	system/keymaster \
+	system/security/softkeymaster/include
+
+LOCAL_CFLAGS = -Wall -Werror -Wunused
+LOCAL_CLANG_CFLAGS += -Wno-error=unused-const-variable -Wno-error=unused-private-field
+LOCAL_MODULE_TAGS := tests
+LOCAL_SHARED_LIBRARIES := \
+	libsoftkeymasterdevice \
+	libkeymaster_messages \
+	libkeymaster_portable \
+	libcrypto \
+	libsoftkeymaster \
+	libhardware
+
+LOCAL_ADDITIONAL_DEPENDENCIES := $(LOCAL_PATH)/Android.mk
+include $(BUILD_NATIVE_TEST)
