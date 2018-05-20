@@ -73,8 +73,50 @@ keymaster_error_t optee_generate_key(const keymaster2_device_t* dev,  //
                                   const keymaster_key_param_set_t* params,
                                   keymaster_key_blob_t* key_blob,
                                   keymaster_key_characteristics_t* characteristics) {
+    keymaster_error_t error = KM_ERROR_OK;
+    KeymasterKeyBlob generated_blob;
+    KeymasterKeyBlob ret_blob;
+    AuthorizationSet key_description;
+    AuthorizationSet sw_enforced, hw_enforced;
+    keymaster_algorithm_t algorithm;
+    uint32_t key_len;
+
 	LOG_D("%s:%d\n", __func__, __LINE__);
-	return KM_ERROR_OK;
+    if (!dev || !params) {
+        LOG_D("%s:%d\n", __func__, __LINE__);
+        return KM_ERROR_UNEXPECTED_NULL_POINTER;
+    }
+
+    if (!key_blob) {
+        LOG_D("%s:%d\n", __func__, __LINE__);
+        return KM_ERROR_OUTPUT_PARAMETER_NULL;
+    }
+
+    if (!key_description.Reinitialize(*params)) {
+        LOG_D("%s:%d\n", __func__, __LINE__);
+        LOG_D("Reinitialize failed !", 0);
+        error = KM_ERROR_MEMORY_ALLOCATION_FAILED;
+        goto out;
+    }
+
+    if (!key_description.GetTagValue(TAG_ALGORITHM, &algorithm)) {
+        LOG_D("%s:%d\n", __func__, __LINE__);
+        LOG_D("Cannot get algorithm!", 0);
+        error = KM_ERROR_UNSUPPORTED_ALGORITHM;
+        goto out;
+    }
+
+    if (algorithm == KM_ALGORITHM_AES) {
+        if (!key_description.GetTagValue(TAG_KEY_SIZE, key_len) ||
+                (key_len != 128 && key_len != 256 && key_len != 192)) {
+            error = KM_ERROR_UNSUPPORTED_KEY_SIZE;
+            goto out;
+        }
+
+        // TODO generate aes key n save to key_blob
+    }
+
+    return KM_ERROR_OK;
 }
 
 keymaster_error_t optee_get_key_characteristics(
