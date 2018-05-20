@@ -85,6 +85,8 @@ Return<ErrorCode> KeymasterDevice::abort(uint64_t operationHandle) {
 }
 
 IKeymasterDevice *KeymasterDevice::getInstance(void){
+  //compare with BiometricsFingerprint.cpp
+  //need to return new instance every time?
   return new KeymasterDevice();
 }
 
