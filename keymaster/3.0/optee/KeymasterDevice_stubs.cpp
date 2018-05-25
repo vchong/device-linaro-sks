@@ -1,12 +1,14 @@
+
 #define LOG_TAG "android.hardware.keymaster@3.0-impl.optee"
 
-#include "KeymasterDevice.h"
+#include "KeymasterDevice_stubs.h"
 
 namespace android {
 namespace hardware {
 namespace keymaster {
 namespace V3_0 {
 namespace implementation {
+namespace optee {
 
 // Methods from IKeymasterDevice follow.
 Return<void> KeymasterDevice::getHardwareFeatures(getHardwareFeatures_cb _hidl_cb) {
@@ -96,6 +98,7 @@ IKeymasterDevice *KeymasterDevice::getInstance(void){
 //    return new KeymasterDevice();
 //}
 
+}  // namespace optee
 }  // namespace implementation
 }  // namespace V3_0
 }  // namespace keymaster

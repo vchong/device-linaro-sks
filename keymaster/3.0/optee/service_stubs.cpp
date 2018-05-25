@@ -26,7 +26,7 @@
 #include <hidl/LegacySupport.h>
 #include <utils/Log.h>
 
-#include "KeymasterDevice.h"
+#include "KeymasterDevice_stubs.h"
 
 // libhwbinder:
 using android::hardware::configureRpcThreadpool;

@@ -10,6 +10,7 @@ namespace hardware {
 namespace keymaster {
 namespace V3_0 {
 namespace implementation {
+namespace optee {
 
 using ::android::hardware::hidl_array;
 using ::android::hardware::hidl_memory;
@@ -45,6 +46,7 @@ struct KeymasterDevice : public IKeymasterDevice {
 // FIXME: most likely delete, this is only for passthrough implementations
 // extern "C" IKeymasterDevice* HIDL_FETCH_IKeymasterDevice(const char* name);
 
+}  // namespace optee
 }  // namespace implementation
 }  // namespace V3_0
 }  // namespace keymaster
