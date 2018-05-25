@@ -12,6 +12,9 @@ cc_library_shared {
         "libhidltransport",
         "libutils",
         "libhardware",
+        "libcrypto",
+        "libkeymaster_portable",
+        "libkeymaster_staging",
         "android.hardware.keymaster@3.0",
     ],
 }
@@ -20,7 +23,7 @@ cc_library_shared {
 cc_binary {
     name: "android.hardware.keymaster@3.0-service.optee",
     relative_install_path: "hw",
-    //defaults: ["hidl_defaults"],
+    defaults: ["hidl_defaults"],
     init_rc: ["android.hardware.keymaster@3.0-service.optee.rc"],
     srcs: ["service.cpp", "KeymasterDevice.cpp"],
     cflags: ["-Wall", "-Wno-error"],
@@ -34,6 +37,9 @@ cc_binary {
         "libhardware",
         "libhidlbase",
         "libhidltransport",
+        "libcrypto",
+        "libkeymaster_portable",
+        "libkeymaster_staging",
         "android.hardware.keymaster@3.0",
         //"android.hardware.keymaster@3.0-impl.optee",
     ],

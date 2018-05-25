@@ -8,7 +8,7 @@ namespace hardware {
 namespace keymaster {
 namespace V3_0 {
 namespace implementation {
-namespace optee {
+//namespace optee {
 
 // Methods from IKeymasterDevice follow.
 Return<void> KeymasterDevice::getHardwareFeatures(getHardwareFeatures_cb _hidl_cb) {
@@ -98,7 +98,7 @@ IKeymasterDevice *KeymasterDevice::getInstance(void){
 //    return new KeymasterDevice();
 //}
 
-}  // namespace optee
+//}  // namespace optee
 }  // namespace implementation
 }  // namespace V3_0
 }  // namespace keymaster

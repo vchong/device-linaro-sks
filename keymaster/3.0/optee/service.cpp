@@ -1,6 +1,6 @@
 /*
 **
-** Copyright 2016, The Android Open Source Project
+** Copyright 2018, The Android Open Source Project
 **
 ** Licensed under the Apache License, Version 2.0 (the "License");
 ** you may not use this file except in compliance with the License.
@@ -26,7 +26,7 @@
 #include <hidl/LegacySupport.h>
 #include <utils/Log.h>
 
-#include "KeymasterDevice_stubs.h"
+#include "KeymasterDevice.h"
 
 // libhwbinder:
 using android::hardware::configureRpcThreadpool;
@@ -36,13 +36,18 @@ using android::hardware::joinRpcThreadpool;
 using android::hardware::keymaster::V3_0::IKeymasterDevice;
 //using android::hardware::keymaster::V3_0::implementation::optee::KeymasterDevice;
 using android::hardware::keymaster::V3_0::implementation::KeymasterDevice;
+using android::hardware::defaultPassthroughServiceImplementation;
 
 using android::sp;
 using android::status_t;
 using android::OK;
 
 int main() {
-	  status_t status;
+    return defaultPassthroughServiceImplementation<IKeymasterDevice>();
+}
+
+int main_binderized() {
+	  status_t status = OK;
 	  android::sp<IKeymasterDevice> service = KeymasterDevice::getInstance();
 
 	  ALOGE("KeymasterDevice HAL main");
