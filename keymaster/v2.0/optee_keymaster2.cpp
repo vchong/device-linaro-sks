@@ -93,6 +93,10 @@ OpteeKeymasterDevice::OpteeKeymasterDevice(const hw_module_t* module) {
     device_.common.module = const_cast<hw_module_t*>(module);
     device_.common.close = close_device;
 
+    //keymaster2.h
+    //keymaster2 software devices set this to some flags
+    //keymaster2 hardware devices must set this to zero
+    //so why set this?
     device_.flags = KEYMASTER_SUPPORTS_EC;
 
     device_.configure = configure;
@@ -109,34 +113,10 @@ OpteeKeymasterDevice::OpteeKeymasterDevice(const hw_module_t* module) {
     device_.update = update;
     device_.finish = finish;
     device_.abort = abort;
-
-    int rc = optee_keymaster_connect();
-    error_ = translate_error(rc);
-    if (rc < 0) {
-        ALOGE("failed to connect to keymaster (%d)", rc);
-        return;
-    }
-
-    GetVersionRequest version_request;
-    GetVersionResponse version_response;
-    error_ = Send(KM_GET_VERSION, version_request, &version_response);
-    if (error_ == KM_ERROR_INVALID_ARGUMENT || error_ == KM_ERROR_UNIMPLEMENTED) {
-        ALOGE("\"Bad parameters\" error on GetVersion call.  Version 0 is not supported.");
-        error_ = KM_ERROR_VERSION_MISMATCH;
-        return;
-    }
-    message_version_ = MessageVersion(version_response.major_ver, version_response.minor_ver,
-                                      version_response.subminor_ver);
-    if (message_version_ < 0) {
-        // Can't translate version?  Keymaster implementation must be newer.
-        ALOGE("Keymaster version %d.%d.%d not supported.", version_response.major_ver,
-              version_response.minor_ver, version_response.subminor_ver);
-        error_ = KM_ERROR_VERSION_MISMATCH;
-    }
 }
 
 OpteeKeymasterDevice::~OpteeKeymasterDevice() {
-    optee_keymaster_disconnect();
+
 }
 
 namespace {
@@ -755,40 +735,7 @@ keymaster_error_t OpteeKeymasterDevice::abort(const keymaster2_device_t* dev,
 
 keymaster_error_t OpteeKeymasterDevice::Send(uint32_t command, const Serializable& req,
                                               KeymasterResponse* rsp) {
-    uint32_t req_size = req.SerializedSize();
-    if (req_size > SEND_BUF_SIZE) {
-        return KM_ERROR_MEMORY_ALLOCATION_FAILED;
-    }
-    uint8_t send_buf[SEND_BUF_SIZE];
-    Eraser send_buf_eraser(send_buf, SEND_BUF_SIZE);
-    req.Serialize(send_buf, send_buf + req_size);
 
-    // Send it
-    uint8_t recv_buf[RECV_BUF_SIZE];
-    Eraser recv_buf_eraser(recv_buf, RECV_BUF_SIZE);
-    uint32_t rsp_size = RECV_BUF_SIZE;
-    ALOGV("Sending %d byte request\n", (int)req.SerializedSize());
-    int rc = optee_keymaster_call(command, send_buf, req_size, recv_buf, &rsp_size);
-    if (rc < 0) {
-        // Reset the connection on tipc error
-        optee_keymaster_disconnect();
-        optee_keymaster_connect();
-        ALOGE("tipc error: %d\n", rc);
-        // TODO(swillden): Distinguish permanent from transient errors and set error_ appropriately.
-        return translate_error(rc);
-    } else {
-        ALOGV("Received %d byte response\n", rsp_size);
-    }
-
-    const uint8_t* p = recv_buf;
-    if (!rsp->Deserialize(&p, p + rsp_size)) {
-        ALOGE("Error deserializing response of size %d\n", (int)rsp_size);
-        return KM_ERROR_UNKNOWN_ERROR;
-    } else if (rsp->error != KM_ERROR_OK) {
-        ALOGE("Response of size %d contained error code %d\n", (int)rsp_size, (int)rsp->error);
-        return rsp->error;
-    }
-    return rsp->error;
 }
 
 }  // namespace keymaster
