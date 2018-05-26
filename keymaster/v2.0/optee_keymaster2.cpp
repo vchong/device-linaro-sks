@@ -17,9 +17,20 @@
 #include <string.h>
 #include <stdint.h>
 
+//fr soft_keymaster_device.cpp
+#include <assert.h>
+#include <stddef.h>
+#include <stdio.h>
+#include <string.h>
+#include <time.h>
+
 #include <iostream>
 #include <algorithm>
 //#include <keystore/keystore.h>
+
+//fr soft_keymaster_device.cpp
+#include <vector>
+#include <type_traits>
 
 #include <hardware/hardware.h>
 #include <hardware/keymaster0.h>
@@ -40,6 +51,13 @@
 #include <keymaster/android_keymaster_utils.h>
 #include <keymaster/authorization_set.h>
 #include <keymaster/keymaster_enforcement.h>
+//#include "linaro_keymaster_context.h"
+
+//fr soft_keymaster_device.cpp
+#include <keymaster/android_keymaster.h>
+#include <keymaster/android_keymaster_messages.h>
+
+#include "openssl_utils.h"
 
 // For debugging
 #define LOG_NDEBUG 1
@@ -48,13 +66,39 @@
 #define LOG_TAG "OpteeKeyMaster2"
 #endif
 
+namespace optee_keymaster {
+
 using namespace keymaster;
 
 /* keymaster2 APIs */
 keymaster_error_t optee_configure(const keymaster2_device_t* dev,
                                                  const keymaster_key_param_set_t* params) {
 	LOG_D("%s:%d\n", __func__, __LINE__);
-	return KM_ERROR_OK;
+
+    if (!params) {
+        return KM_ERROR_UNEXPECTED_NULL_POINTER;
+    }
+
+    AuthorizationSet params_copy(*params);
+    ConfigureRequest request;
+    if (!params_copy.GetTagValue(TAG_OS_VERSION, &request.os_version) ||
+        !params_copy.GetTagValue(TAG_OS_PATCHLEVEL, &request.os_patchlevel)) {
+        LOG_E("Configuration parameters must contain OS version and patch level", 0);
+        return KM_ERROR_INVALID_ARGUMENT;
+    }
+
+    ConfigureResponse response;
+    convert_device(dev)->impl_->Configure(request, &response);
+    if (response.error == KM_ERROR_OK)
+        convert_device(dev)->configured_ = true;
+    return response.error;
+
+    keymaster_error_t err = Send(KM_CONFIGURE, request, &response);
+    if (err != KM_ERROR_OK) {
+        return err;
+    }
+
+    return KM_ERROR_OK;
 }
 
 keymaster_error_t optee_add_rng_entropy(const keymaster1_device_t* dev,
@@ -79,7 +123,6 @@ keymaster_error_t optee_generate_key(const keymaster2_device_t* dev,  //
     AuthorizationSet key_description;
     AuthorizationSet sw_enforced, hw_enforced;
     keymaster_algorithm_t algorithm;
-    uint32_t key_len;
 
 	LOG_D("%s:%d\n", __func__, __LINE__);
     if (!dev || !params) {
@@ -107,16 +150,16 @@ keymaster_error_t optee_generate_key(const keymaster2_device_t* dev,  //
     }
 
     if (algorithm == KM_ALGORITHM_AES) {
-        if (!key_description.GetTagValue(TAG_KEY_SIZE, key_len) ||
-                (key_len != 128 && key_len != 256 && key_len != 192)) {
-            error = KM_ERROR_UNSUPPORTED_KEY_SIZE;
-            goto out;
-        }
-
-        // TODO generate aes key n save to key_blob
+        //error = get_and_validate_aes_keygen_params(key_description, &aml_key.key_len);
+        CHK_ERR_AND_LEAVE(error, "get_and_validate_aes_keygen_params failed", out);
     }
 
-    return KM_ERROR_OK;
+out:
+    if (error != KM_ERROR_OK) {
+        //KM1_delete_key(aml_key.handle, sizeof(aml_key.handle));
+    }
+
+    return error;
 }
 
 keymaster_error_t optee_get_key_characteristics(
@@ -208,3 +251,5 @@ keymaster_error_t optee_abort(const keymaster2_device_t* dev,
 	LOG_D("%s:%d\n", __func__, __LINE__);
 	return KM_ERROR_OK;
 }
+
+} // namespace optee_keymaster

@@ -22,10 +22,12 @@
 
 #include <hardware/hardware.h>
 #include <hardware/keymaster_common.h>
+#include <hardware/keymaster0.h>
 
 #include <openssl/err.h>
 
 #include <UniquePtr.h>
+
 #include "optee_keymaster2.h"
 
 // For debugging
@@ -43,6 +45,9 @@ static int optee_km_close(hw_device_t *dev)
 	return 0;
 }
 
+/*
+ * Generic device handling
+ */
 static int optee_km_open(const hw_module_t* module, const char* name,
 		hw_device_t** device)
 {
@@ -62,9 +67,10 @@ static int optee_km_open(const hw_module_t* module, const char* name,
 	dev->common.module = (struct hw_module_t*) module;
 	dev->common.close = optee_km_close;
 
-	/* For KEYMASTER_MODULE_API_VERSION_0_3,
-	   Set flags to KEYMASTER_SUPPORTS_DSA | KEYMASTER_SUPPORTS_EC */
-	dev->flags = KEYMASTER_SUPPORTS_DSA | KEYMASTER_SUPPORTS_EC;
+	//keymaster2.h
+	//keymaster2 hardware devices must set this to zero
+	//keymaster2 software devices set this to some flags
+	dev->flags = 0;
 
     dev->configure = optee_configure;
     dev->add_rng_entropy = optee_add_rng_entropy;

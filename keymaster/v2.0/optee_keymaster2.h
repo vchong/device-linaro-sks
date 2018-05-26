@@ -14,16 +14,15 @@
  * limitations under the License.
  */
 
-#include <hardware/keymaster0.h>
-#include <hardware/keymaster1.h>
-#include <hardware/keymaster2.h>
-
 #ifndef OPTEE_KEYMASTER_DEVICE_H_
 #define OPTEE_KEYMASTER_DEVICE_H_
 
-extern "C" {
-extern struct keystore_module optee_keymaster_device_module;
-}
+//#include <hardware/keymaster0.h>
+//#include <hardware/keymaster1.h>
+#include <hardware/keymaster2.h>
+#include <keymaster/android_keymaster_messages.h>
+
+namespace optee_keymaster {
 
 // Keymaster2 methods
 keymaster_error_t optee_configure(const keymaster2_device_t* dev,
@@ -82,5 +81,7 @@ keymaster_error_t optee_finish(const keymaster2_device_t* dev,  //
                                     keymaster_blob_t* output);
 keymaster_error_t optee_abort(const keymaster2_device_t* dev,
                                    keymaster_operation_handle_t operation_handle);
+
+} // namespace optee_keymaster
 
 #endif  // OPTEE_KEYMASTER_DEVICE_H_
