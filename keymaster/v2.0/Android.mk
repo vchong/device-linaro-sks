@@ -76,7 +76,8 @@ LOCAL_SHARED_LIBRARIES := libcrypto \
 			  libkeystore_binder \
 			  libteec \
 			  libkeymaster_messages \
-			  libkeymaster_portable
+			  libkeymaster_portable \
+			  libcutils
 
 LOCAL_MODULE_TAGS := optional
 LOCAL_EXPORT_C_INCLUDE_DIRS := $(LOCAL_PATH)

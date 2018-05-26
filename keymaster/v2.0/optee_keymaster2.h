@@ -14,73 +14,140 @@
  * limitations under the License.
  */
 
-#include <hardware/keymaster0.h>
-#include <hardware/keymaster1.h>
+#ifndef OPTEE_KEYMASTER2_H_
+#define OPTEE_KEYMASTER2_H_
+
 #include <hardware/keymaster2.h>
+#include <keymaster/android_keymaster_messages.h>
 
-#ifndef OPTEE_KEYMASTER_DEVICE_H_
-#define OPTEE_KEYMASTER_DEVICE_H_
+namespace keymaster {
 
-extern "C" {
-extern struct keystore_module optee_keymaster_device_module;
-}
+/**
+ * Optee Keymaster device.
+ *
+ * IMPORTANT MAINTAINER NOTE: Pointers to instances of this class must be castable to hw_device_t
+ * and keymaster_device. This means it must remain a standard layout class (no virtual functions and
+ * no data members which aren't standard layout), and device_ must be the first data member.
+ * Assertions in the constructor validate compliance with those constraints.
+ */
+class OpteeKeymasterDevice {
+  public:
+    /*
+     * These are the only symbols that will be exported by libopteekeymaster.  All functionality
+     * can be reached via the function pointers in device_.
+     */
+    __attribute__((visibility("default"))) explicit OpteeKeymasterDevice(const hw_module_t* module);
+    __attribute__((visibility("default"))) hw_device_t* hw_device();
 
-// Keymaster2 methods
-keymaster_error_t optee_configure(const keymaster2_device_t* dev,
+    ~OpteeKeymasterDevice();
+
+    keymaster_error_t session_error() { return error_; }
+
+    keymaster_error_t configure(const keymaster_key_param_set_t* params);
+    keymaster_error_t add_rng_entropy(const uint8_t* data, size_t data_length);
+    keymaster_error_t generate_key(const keymaster_key_param_set_t* params,
+                                   keymaster_key_blob_t* key_blob,
+                                   keymaster_key_characteristics_t* characteristics);
+    keymaster_error_t get_key_characteristics(const keymaster_key_blob_t* key_blob,
+                                              const keymaster_blob_t* client_id,
+                                              const keymaster_blob_t* app_data,
+                                              keymaster_key_characteristics_t* character);
+    keymaster_error_t import_key(const keymaster_key_param_set_t* params,
+                                 keymaster_key_format_t key_format,
+                                 const keymaster_blob_t* key_data, keymaster_key_blob_t* key_blob,
+                                 keymaster_key_characteristics_t* characteristics);
+    keymaster_error_t export_key(keymaster_key_format_t export_format,
+                                 const keymaster_key_blob_t* key_to_export,
+                                 const keymaster_blob_t* client_id,
+                                 const keymaster_blob_t* app_data, keymaster_blob_t* export_data);
+    keymaster_error_t attest_key(const keymaster_key_blob_t* key_to_attest,
+                                 const keymaster_key_param_set_t* attest_params,
+                                 keymaster_cert_chain_t* cert_chain);
+    keymaster_error_t upgrade_key(const keymaster_key_blob_t* key_to_upgrade,
+                                  const keymaster_key_param_set_t* upgrade_params,
+                                  keymaster_key_blob_t* upgraded_key);
+    keymaster_error_t begin(keymaster_purpose_t purpose, const keymaster_key_blob_t* key,
+                            const keymaster_key_param_set_t* in_params,
+                            keymaster_key_param_set_t* out_params,
+                            keymaster_operation_handle_t* operation_handle);
+    keymaster_error_t update(keymaster_operation_handle_t operation_handle,
+                             const keymaster_key_param_set_t* in_params,
+                             const keymaster_blob_t* input, size_t* input_consumed,
+                             keymaster_key_param_set_t* out_params, keymaster_blob_t* output);
+    keymaster_error_t finish(keymaster_operation_handle_t operation_handle,
+                             const keymaster_key_param_set_t* in_params,
+                             const keymaster_blob_t* input, const keymaster_blob_t* signature,
+                             keymaster_key_param_set_t* out_params, keymaster_blob_t* output);
+    keymaster_error_t abort(keymaster_operation_handle_t operation_handle);
+
+  private:
+    keymaster_error_t Send(uint32_t command, const Serializable& request,
+                           KeymasterResponse* response);
+
+    /*
+     * These static methods are the functions referenced through the function pointers in
+     * keymaster_device.  They're all trivial wrappers.
+     */
+    static int close_device(hw_device_t* dev);
+    static keymaster_error_t configure(const keymaster2_device_t* dev,
                                        const keymaster_key_param_set_t* params);
-keymaster_error_t optee_add_rng_entropy(const keymaster2_device_t* dev, const uint8_t* data,
+    static keymaster_error_t add_rng_entropy(const keymaster2_device_t* dev, const uint8_t* data,
                                              size_t data_length);
-keymaster_error_t optee_generate_key(const keymaster2_device_t* dev,
+    static keymaster_error_t generate_key(const keymaster2_device_t* dev,
                                           const keymaster_key_param_set_t* params,
                                           keymaster_key_blob_t* key_blob,
                                           keymaster_key_characteristics_t* characteristics);
-keymaster_error_t optee_get_key_characteristics(const keymaster2_device_t* dev,
+    static keymaster_error_t get_key_characteristics(const keymaster2_device_t* dev,
                                                      const keymaster_key_blob_t* key_blob,
                                                      const keymaster_blob_t* client_id,
                                                      const keymaster_blob_t* app_data,
                                                      keymaster_key_characteristics_t* character);
-keymaster_error_t optee_import_key(const keymaster2_device_t* dev,  //
+    static keymaster_error_t import_key(const keymaster2_device_t* dev,
                                         const keymaster_key_param_set_t* params,
                                         keymaster_key_format_t key_format,
                                         const keymaster_blob_t* key_data,
                                         keymaster_key_blob_t* key_blob,
                                         keymaster_key_characteristics_t* characteristics);
-keymaster_error_t optee_export_key(const keymaster2_device_t* dev,  //
+    static keymaster_error_t export_key(const keymaster2_device_t* dev,
                                         keymaster_key_format_t export_format,
                                         const keymaster_key_blob_t* key_to_export,
                                         const keymaster_blob_t* client_id,
                                         const keymaster_blob_t* app_data,
                                         keymaster_blob_t* export_data);
-keymaster_error_t optee_attest_key(const keymaster2_device_t* dev,
+    static keymaster_error_t attest_key(const keymaster2_device_t* dev,
                                         const keymaster_key_blob_t* key_to_attest,
                                         const keymaster_key_param_set_t* attest_params,
                                         keymaster_cert_chain_t* cert_chain);
-keymaster_error_t optee_upgrade_key(const keymaster2_device_t* dev,
+    static keymaster_error_t upgrade_key(const keymaster2_device_t* dev,
                                          const keymaster_key_blob_t* key_to_upgrade,
                                          const keymaster_key_param_set_t* upgrade_params,
                                          keymaster_key_blob_t* upgraded_key);
-keymaster_error_t optee_delete_key(const keymaster2_device_t* dev,
+    static keymaster_error_t delete_key(const keymaster2_device_t* dev,
                                         const keymaster_key_blob_t* key);
-keymaster_error_t optee_delete_all_keys(const keymaster2_device_t* dev);
-keymaster_error_t optee_begin(const keymaster2_device_t* dev, keymaster_purpose_t purpose,
+    static keymaster_error_t delete_all_keys(const keymaster2_device_t* dev);
+    static keymaster_error_t begin(const keymaster2_device_t* dev, keymaster_purpose_t purpose,
                                    const keymaster_key_blob_t* key,
                                    const keymaster_key_param_set_t* in_params,
                                    keymaster_key_param_set_t* out_params,
                                    keymaster_operation_handle_t* operation_handle);
-keymaster_error_t optee_update(const keymaster2_device_t* dev,  //
+    static keymaster_error_t update(const keymaster2_device_t* dev,
                                     keymaster_operation_handle_t operation_handle,
                                     const keymaster_key_param_set_t* in_params,
                                     const keymaster_blob_t* input, size_t* input_consumed,
-                                    keymaster_key_param_set_t* out_params,
-                                    keymaster_blob_t* output);
-keymaster_error_t optee_finish(const keymaster2_device_t* dev,  //
+                                    keymaster_key_param_set_t* out_params, keymaster_blob_t* output);
+    static keymaster_error_t finish(const keymaster2_device_t* dev,
                                     keymaster_operation_handle_t operation_handle,
                                     const keymaster_key_param_set_t* in_params,
-                                    const keymaster_blob_t* input,
-                                    const keymaster_blob_t* signature,
-                                    keymaster_key_param_set_t* out_params,
-                                    keymaster_blob_t* output);
-keymaster_error_t optee_abort(const keymaster2_device_t* dev,
+                                    const keymaster_blob_t* input, const keymaster_blob_t* signature,
+                                    keymaster_key_param_set_t* out_params, keymaster_blob_t* output);
+    static keymaster_error_t abort(const keymaster2_device_t* dev,
                                    keymaster_operation_handle_t operation_handle);
 
-#endif  // OPTEE_KEYMASTER_DEVICE_H_
+    keymaster2_device_t device_;
+    keymaster_error_t error_;
+    int32_t message_version_;
+};
+
+}  // namespace keymaster
+
+#endif  // OPTEE_KEYMASTER2_H_
