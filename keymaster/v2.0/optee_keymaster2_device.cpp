@@ -30,14 +30,16 @@
 #include <type_traits>
 
 #include <hardware/keymaster2.h>
+#include <keymaster/android_keymaster_messages.h>
 #include <keymaster/authorization_set.h>
 #include <log/log.h>
 
-#include "optee_keymaster2.h"
+#include "optee_keymaster2_device.h"
+#include "optee_keymaster2_cwrapper.h"
 
 #define PAGE_SIZE 4096
 const uint32_t RECV_BUF_SIZE = 2*PAGE_SIZE;
-const uint32_t SEND_BUF_SIZE = (PAGE_SIZE - sizeof(struct keymaster_message) - 16 /* tipc header */);
+const uint32_t SEND_BUF_SIZE = 2*PAGE_SIZE; //(PAGE_SIZE - sizeof(struct keymaster_message) - 16 /* tipc header */);
 
 const size_t kMaximumAttestationChallengeLength = 128;
 const size_t kMaximumFinishInputLength = 2048;
@@ -163,10 +165,10 @@ keymaster_error_t OpteeKeymasterDevice::configure(const keymaster_key_param_set_
         return KM_ERROR_INVALID_ARGUMENT;
     }
 
-    ConfigureResponse response(message_version_);
-    keymaster_error_t err = Send(KM_CONFIGURE, request, &response);
-    if (err != KM_ERROR_OK) {
-        return err;
+    keymaster_error_t error = KM2_secure_configure(request);
+    if (error != KM_ERROR_OK) {
+        ALOGE("%s:%d: KM2_secure_configure failed\n", __func__, __LINE__);
+        return error;
     }
 
     return KM_ERROR_OK;
@@ -629,6 +631,7 @@ static inline OpteeKeymasterDevice* convert_device(const keymaster2_device_t* de
 
 /* static */
 int OpteeKeymasterDevice::close_device(hw_device_t* dev) {
+	//KM_Secure_Terminate(); //needed?
     delete reinterpret_cast<OpteeKeymasterDevice*>(dev);
     return 0;
 }
@@ -735,7 +738,7 @@ keymaster_error_t OpteeKeymasterDevice::abort(const keymaster2_device_t* dev,
 
 keymaster_error_t OpteeKeymasterDevice::Send(uint32_t command, const Serializable& req,
                                               KeymasterResponse* rsp) {
-
+	return KM_ERROR_UNIMPLEMENTED;
 }
 
 }  // namespace keymaster

@@ -19,7 +19,7 @@
 #include <hardware/hardware.h>
 #include <hardware/keymaster0.h>
 
-#include "optee_keymaster2.h"
+#include "optee_keymaster2_device.h"
 
 using keymaster::OpteeKeymasterDevice;
 
