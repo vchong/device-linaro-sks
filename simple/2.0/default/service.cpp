@@ -13,7 +13,7 @@ using android::hardware::joinRpcThreadpool;
 using android::sp;
 
 int main() {
-      int res;
+      int res = 0;
       android::sp<ISimphw> ser = Simphw::getInstance();
       ALOGE("simp main");
       configureRpcThreadpool(1, true /*callerWillJoin*/);
