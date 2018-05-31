@@ -27,7 +27,7 @@ $(GEN): PRIVATE_OUTPUT_DIR := $(intermediates)
 $(GEN): PRIVATE_CUSTOM_TOOL = \
         $(PRIVATE_HIDL) -o $(PRIVATE_OUTPUT_DIR) \
         -Ljava \
-        -randroid.hardware:hardware/interfaces \
+        -randroid.hardware:device/linaro/sks \
         -randroid.hidl:system/libhidl/transport \
         android.hardware.simple@2.0::ISimphw
 
@@ -62,7 +62,7 @@ $(GEN): PRIVATE_OUTPUT_DIR := $(intermediates)
 $(GEN): PRIVATE_CUSTOM_TOOL = \
         $(PRIVATE_HIDL) -o $(PRIVATE_OUTPUT_DIR) \
         -Ljava \
-        -randroid.hardware:hardware/interfaces \
+        -randroid.hardware:device/linaro/sks \
         -randroid.hidl:system/libhidl/transport \
         android.hardware.simple@2.0::ISimphw
 
