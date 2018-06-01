@@ -14,6 +14,7 @@ namespace V3_0 {
 namespace implementation {
 //namespace optee {
 
+using ::android::hardware::keymaster::V3_0::ErrorCode;
 using ::android::hardware::keymaster::V3_0::IKeymasterDevice;
 using ::android::hardware::keymaster::V3_0::KeyCharacteristics;
 using ::android::hardware::keymaster::V3_0::KeyFormat;
