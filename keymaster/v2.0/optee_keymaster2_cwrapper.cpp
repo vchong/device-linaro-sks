@@ -1118,11 +1118,11 @@ keymaster_error_t KM2_asymmetric_en_de_crypt_with_handle(
         LOG_D("op_mode (%x)\n", op_mode);
         LOG_D("digest_len(%d)\n", digest_len);
         switch (res) {
-            case TEE_ERROR_ARGUMENT_INVALID:
+            case 0: //TEE_ERROR_ARGUMENT_INVALID:
                 LOG_D("asymmetric_sign_tee_ca failed with TEE_ERROR_ARGUMENT_INVALID(%x)\n", res);
                 ret = KM_ERROR_INVALID_ARGUMENT;
                 break;
-            case TEE_ERROR_INPUT_LENGTH_INVALID:
+            case 1: //TEE_ERROR_INPUT_LENGTH_INVALID:
                 LOG_D("asymmetric_sign_tee_ca failed with TEE_ERROR_INPUT_LENGTH_INVALID(%x)\n", res);
                 ret = KM_ERROR_INVALID_INPUT_LENGTH;
                 break;
