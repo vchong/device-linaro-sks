@@ -37,11 +37,16 @@ LOCAL_MULTILIB := 32
 endif
 LOCAL_MODULE := keystore.$(TARGET_BOARD_PLATFORM)
 
-ifeq ($(shell test $(PLATFORM_SDK_VERSION) -ge 21 && echo OK),OK)
-	LOCAL_MODULE_RELATIVE_PATH := hw
-else
-	LOCAL_MODULE_PATH := $(TARGET_OUT_SHARED_LIBRARIES)/hw
-endif
+#ifeq ($(shell test $(PLATFORM_SDK_VERSION) -ge 21 && echo OK),OK)
+#	LOCAL_MODULE_RELATIVE_PATH := hw
+#else
+#	LOCAL_MODULE_PATH := $(TARGET_OUT_SHARED_LIBRARIES)/hw
+#endif
+
+LOCAL_MODULE_PATH_32 := $(TARGET_OUT_VENDOR)/lib/hw
+LOCAL_MODULE_PATH_64 := $(TARGET_OUT_VENDOR)/lib64/hw
+
+LOCAL_HEADER_LIBRARIES += libhardware_headers
 
 LOCAL_SRC_FILES := module.cpp \
 		   optee_keymaster2_device.cpp \
