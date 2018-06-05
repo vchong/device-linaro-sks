@@ -24,11 +24,15 @@ endif
 LOCAL_MODULE := keystore0_2.$(TARGET_BOARD_PLATFORM)
 #LOCAL_MODULE := keystore.$(TARGET_PRODUCT)
 
-ifeq ($(shell test $(PLATFORM_SDK_VERSION) -ge 21 && echo OK),OK)
-	LOCAL_MODULE_RELATIVE_PATH := hw
-else
-	LOCAL_MODULE_PATH := $(TARGET_OUT_SHARED_LIBRARIES)/hw
-endif
+#ifeq ($(shell test $(PLATFORM_SDK_VERSION) -ge 21 && echo OK),OK)
+#	LOCAL_MODULE_RELATIVE_PATH := hw
+#else
+#	LOCAL_MODULE_PATH := $(TARGET_OUT_SHARED_LIBRARIES)/hw
+#endif
+LOCAL_MODULE_RELATIVE_PATH := hw
+LOCAL_VENDOR_MODULE := true
+
+LOCAL_HEADER_LIBRARIES += libhardware_headers
 
 LOCAL_SRC_FILES := module.cpp
 LOCAL_C_INCLUDES := system/security/keystore
